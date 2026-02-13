@@ -38,6 +38,3 @@ Run `python model/train_bank_marketing.py` to train and generate metrics. Paste 
    - Saves pipelines to `model/artifacts/*.joblib` and metrics to `model/metrics_summary.csv` & `model/metrics_summary.md`.  
 3. **Run Streamlit locally**: `streamlit run app.py`  
 4. **Deploy** (Streamlit Cloud): New App → pick repo → branch → `app.py` → Deploy.
-
-## BITS Virtual Lab proof
-Run the training script on BITS Virtual Lab and capture a screenshot of successful execution (include it in your submission PDF).
