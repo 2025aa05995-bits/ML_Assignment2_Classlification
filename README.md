@@ -10,7 +10,8 @@ Build and compare multiple classification models to predict whether a customer s
 We use the **UCI Bank Marketing** dataset (binary classification: target `y` ∈ {`yes`,`no`}). In line with recommended practice, the `duration` column (last contact length) is excluded to avoid data leakage. Key inputs include: `age`, `job`, `marital`, `education`, `default`, `housing`, `loan`, `contact`, `month`, `day_of_week`, `campaign`, `pdays`, `previous`, `poutcome`. Target: `y` (`yes`/`no`).
 
 ## c. Models used (with evaluation metrics)
-Run `python model/train_bank_marketing.py` to train and generate metrics. Paste the values into the table below.
+Run `python model/train_bank_marketing.py` to train and generate new metrics. 
+Below Data generated during training. 
 
 | model         |   accuracy |    auc |   precision |   recall |     f1 |    mcc |
 |:--------------|-----------:|-------:|------------:|---------:|-------:|-------:|
