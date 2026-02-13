@@ -1,0 +1,6 @@
+age;job;marital;education;default;housing;loan;contact;month;day_of_week;campaign;pdays;previous;poutcome;emp.var.rate;cons.price.idx;cons.conf.idx;euribor3m;nr.employed;y
+34;technician;single;university.degree;no;yes;no;cellular;may;mon;1;999;0;nonexistent;-1.8;92.893;-46.2;1.313;5099.1;no
+45;blue-collar;married;basic.9y;unknown;yes;no;telephone;jul;fri;2;6;2;failure;-1.7;94.215;-26.9;4.857;5195.8;no
+29;admin.;single;high.school;no;no;no;cellular;aug;wed;1;999;0;nonexistent;1.4;93.918;-42.7;4.021;5228.1;yes
+52;management;married;university.degree;no;yes;yes;cellular;nov;thu;3;3;1;success;-0.1;93.2;-42.0;0.729;5017.5;yes
+37;services;divorced;basic.6y;no;no;no;telephone;apr;tue;1;999;0;nonexistent;-1.8;92.893;-46.2;1.313;5099.1;no
