@@ -14,14 +14,18 @@ import matplotlib.pyplot as plt
 # ---------------- Page setup ----------------
 st.set_page_config(page_title='Bank Marketing — ML Models', layout='wide')
 st.title('Bank Marketing — Classification Models (Streamlit)')
-st.write('Upload **test CSV** (schema like UCI bank marketing as shown in test data table), pick a model, and view metrics.')
+st.write('Upload **test CSV** (schema like UCI bank marketing), pick a model, and view metrics.')
 
-# ---------------- Metrics helper (custom heading) ----------------
+# ---------------- Metrics helper (custom heading + model name) ----------------
 
 
-def _show_metrics_block(y_true, y_pred, proba, heading: str = 'Evaluation Metrics'):
-    """Render all required metrics + CM + report with a selectable heading."""
-    st.subheader(heading)
+def _show_metrics_block(y_true, y_pred, proba, model_name: str, heading: str = 'Evaluation Metrics'):
+    """
+    Render all required metrics + confusion matrix + Predicted vs Actual + report
+    with a customizable heading that includes the selected model name.
+    """
+    # ---- Metrics
+    st.subheader(f"{heading} — {model_name}")
 
     acc = accuracy_score(y_true, y_pred)
     prec = precision_score(y_true, y_pred, zero_division=0)
@@ -44,17 +48,33 @@ def _show_metrics_block(y_true, y_pred, proba, heading: str = 'Evaluation Metric
         st.metric('MCC', f'{mcc:.4f}')
     st.metric('AUC', '-' if np.isnan(auc) else f'{auc:.4f}')
 
-    # Confusion matrix
-    st.subheader('Confusion Matrix')
+    # ---- Confusion matrix
+    st.subheader(f'Confusion Matrix — {model_name}')
     cm = confusion_matrix(y_true, y_pred)
-    fig, ax = plt.subplots()
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=ax)
-    ax.set_xlabel('Predicted')
-    ax.set_ylabel('Actual')
-    st.pyplot(fig)
+    fig_cm, ax_cm = plt.subplots()
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=ax_cm)
+    ax_cm.set_xlabel('Predicted')
+    ax_cm.set_ylabel('Actual')
+    st.pyplot(fig_cm)
 
-    # Classification report
-    st.subheader('Classification Report')
+    # ---- Predicted vs Actual (class counts side-by-side)
+    st.subheader(f'Predicted vs Actual — {model_name}')
+    df_counts = pd.DataFrame({
+        'Actual': pd.Series(y_true, name='Actual').value_counts().sort_index(),
+        'Predicted': pd.Series(y_pred, name='Predicted').value_counts().sort_index()
+    }).fillna(0).astype(int).reset_index().rename(columns={'index': 'Class'})
+
+    fig_bar, ax_bar = plt.subplots()
+    df_melt = df_counts.melt(id_vars='Class', value_vars=['Actual', 'Predicted'],
+                             var_name='Type', value_name='Count')
+    sns.barplot(data=df_melt, x='Class', y='Count', hue='Type', ax=ax_bar)
+    ax_bar.set_xlabel('Class (0 = no, 1 = yes)')
+    ax_bar.set_ylabel('Count')
+    ax_bar.legend(title='')
+    st.pyplot(fig_bar)
+
+    # ---- Classification report
+    st.subheader(f'Classification Report — {model_name}')
     st.text(classification_report(y_true, y_pred, digits=4))
 
 
@@ -114,15 +134,15 @@ else:
 
         # Predict + show results
         y_pred = pipe.predict(df)
-        st.subheader('Predictions')
+        st.subheader(f'Predictions — {model_name}')
         st.write(pd.DataFrame({'prediction': y_pred}))
 
         if y_true is not None:
             proba = None
             if hasattr(pipe.named_steps['clf'], 'predict_proba'):
                 proba = pipe.predict_proba(df)[:, 1]
-            _show_metrics_block(y_true, y_pred, proba,
-                                heading='Evaluation Metrics')
+            _show_metrics_block(
+                y_true, y_pred, proba, model_name=model_name, heading='Evaluation Metrics')
         else:
             st.info('No label provided — showing predictions only.')
 
@@ -145,15 +165,18 @@ else:
 
         # Predict + show results
         y_pred = pipe.predict(df)
-        st.subheader('Predictions (initial test data)')
+        st.subheader(f'Predictions (initial test data) — {model_name}')
         st.write(pd.DataFrame({'prediction': y_pred}))
 
         if y_true is not None:
             proba = None
             if hasattr(pipe.named_steps['clf'], 'predict_proba'):
                 proba = pipe.predict_proba(df)[:, 1]
-            _show_metrics_block(y_true, y_pred, proba,
-                                heading='Evaluation Metrics (initial test data)')
+            _show_metrics_block(
+                y_true, y_pred, proba,
+                model_name=model_name,
+                heading='Evaluation Metrics (initial test data)'
+            )
 
 # ---------------- Trained metrics table (from training script) ----------------
 metrics_path = Path('model/metrics_summary.csv')
