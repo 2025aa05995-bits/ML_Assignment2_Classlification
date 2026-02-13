@@ -1,7 +1,7 @@
 
 # Bank Marketing Classification — End‑to‑End ML (Streamlit)
 
-> **BITS WILP — Machine Learning Assignment 2**
+> **Machine Learning Assignment**
 
 ## a. Problem statement
 Build and compare multiple classification models to predict whether a customer subscribes to a term deposit during a bank’s telemarketing campaign. The pipeline covers data preparation, model training, held‑out evaluation, and a Streamlit UI for interactive inference and metric visualization.

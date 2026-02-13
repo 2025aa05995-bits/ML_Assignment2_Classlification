@@ -1,5 +1,9 @@
 
-from utils import compute_binary_metrics, METRIC_COLUMNS
+from sklearn.metrics import (
+    accuracy_score, precision_score, recall_score, f1_score,
+    roc_auc_score, matthews_corrcoef, confusion_matrix, classification_report
+)
+import numpy as np
 import joblib
 from xgboost import XGBClassifier
 from sklearn.ensemble import RandomForestClassifier
@@ -18,7 +22,13 @@ import urllib.request
 import zipfile
 import io
 import os
+import pandas as pd
 os.environ["LOKY_MAX_CPU_COUNT"] = "8"
+
+
+METRIC_COLUMNS = [
+    'model', 'accuracy', 'auc', 'precision', 'recall', 'f1', 'mcc'
+]
 
 
 ARTIFACTS = Path('model/artifacts')
@@ -166,6 +176,7 @@ def build_models():
 
 def train_and_save(df):
     df, feature_cols, cat_cols, num_cols = prepare_dataframe(df)
+    print(df.head)
     X, y = df[feature_cols], df['target']
 
     X_train, X_test, y_train, y_test = train_test_split(
@@ -200,12 +211,34 @@ def train_and_save(df):
         joblib.dump(pipe, ARTIFACTS / f'{name}.joblib')
 
     # Save metrics summary
-    import pandas as pd
+
     metrics_df = pd.DataFrame(rows, columns=METRIC_COLUMNS)
+
     metrics_df.to_csv('model/metrics_summary.csv', index=False)
     Path('model/metrics_summary.md').write_text(metrics_df.to_markdown(index=False, floatfmt='.4f'))
 
     print('Saved: model/artifacts/*.joblib, model/metrics_summary.csv, model/metrics_summary.md')
+
+
+def compute_binary_metrics(y_true, y_pred, y_proba):
+    metrics = {
+        'accuracy': accuracy_score(y_true, y_pred),
+        'precision': precision_score(y_true, y_pred, zero_division=0),
+        'recall': recall_score(y_true, y_pred, zero_division=0),
+        'f1': f1_score(y_true, y_pred, zero_division=0),
+        'mcc': matthews_corrcoef(y_true, y_pred),
+    }
+    try:
+        metrics['auc'] = roc_auc_score(y_true, y_proba)
+    except Exception:
+        metrics['auc'] = float('nan')
+    return metrics
+
+
+def report_confusion_and_classification(y_true, y_pred):
+    cm = confusion_matrix(y_true, y_pred)
+    report = classification_report(y_true, y_pred, digits=4)
+    return cm, report
 
 
 if __name__ == '__main__':
