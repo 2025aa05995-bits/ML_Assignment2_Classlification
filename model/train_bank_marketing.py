@@ -1,4 +1,5 @@
 
+import pickle
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
     roc_auc_score, matthews_corrcoef, confusion_matrix, classification_report
@@ -33,6 +34,9 @@ METRIC_COLUMNS = [
 
 ARTIFACTS = Path('model/artifacts')
 ARTIFACTS.mkdir(parents=True, exist_ok=True)
+
+MODEL_FOLDER = Path('model')
+MODEL_FOLDER.mkdir(parents=True, exist_ok=True)
 
 
 UCI_URL = "https://archive.ics.uci.edu/ml/machine-learning-databases/00222/bank-additional.zip"
@@ -209,6 +213,10 @@ def train_and_save(df):
 
         # Save model pipeline
         joblib.dump(pipe, ARTIFACTS / f'{name}.joblib')
+
+        # Save model pipleine in pickle format
+        with open(MODEL_FOLDER / f'{name}.pkl', 'wb') as f:
+            pickle.dump(pipe, f)
 
     # Save metrics summary
 
